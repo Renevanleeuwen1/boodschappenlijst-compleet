@@ -1,0 +1,59 @@
+
+body {
+  font-family: sans-serif;
+  background: #f0f0f0;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 1em;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h1 {
+  color: #335533;
+}
+
+.form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+input {
+  flex: 1;
+  padding: 8px;
+}
+
+button {
+  background: #265c32;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: #e9ffe9;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+li.gekocht {
+  background: #7dbf81;
+  text-decoration: line-through;
+}
