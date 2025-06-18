@@ -7,12 +7,18 @@ recognition.continuous = false;
 recognition.interimResults = false;
 
 const USERS = ["Rene", "Marjolein", "Rosanne"];
+const THEMES = {
+  Rene: "#e0f7fa",       // Lichtblauw
+  Marjolein: "#fce4ec",  // Roze
+  Rosanne: "#e8f5e9",    // Lichtgroen
+};
 
 export default function App() {
   const [user, setUser] = useState("");
   const [items, setItems] = useState([]);
   const [product, setProduct] = useState("");
   const [aantal, setAantal] = useState("");
+const themeColor = THEMES[user] || "#ffffff"; // standaard wit
 
   // Gebruiker bewaren (localStorage)
   useEffect(() => {
@@ -84,7 +90,7 @@ async function deleteItem(id) {
 
 
 return (
-    <div style={{ maxWidth: 420, margin: "2rem auto", fontFamily: "sans-serif" }}>
+    <div style={{ maxWidth: 420, margin: "2rem auto", fontFamily: "sans-serif", background: themeColor, padding: "1rem", borderRadius: "12px" }}>
       <h2>Boodschappenlijst (totaalblad)</h2>
       <label>
         Wie ben je?{" "}
