@@ -8,10 +8,11 @@ recognition.interimResults = false;
 
 const USERS = ["Rene", "Marjolein", "Rosanne"];
 const THEMES = {
-  Rene: "#e0f7fa",       // Lichtblauw
-  Marjolein: "#fce4ec",  // Roze
-  Rosanne: "#e8f5e9",    // Lichtgroen
+  Rene: "#a3b18a",       // mosgroen (licht)
+  Marjolein: "#d9ed92",  // geelgroen
+  Rosanne: "#b5ead7",    // mintgroen
 };
+
 
 export default function App() {
   const [user, setUser] = useState("");
@@ -116,7 +117,7 @@ return (
     onClick={startListening}
     style={{
       marginLeft: 8,
-      background: listening ? "#c0ffc0" : "#eee",
+      background: "#a3b18a", // mosgroen
       border: "1px solid #ccc",
       borderRadius: 6,
       padding: "0.3em 0.7em",
