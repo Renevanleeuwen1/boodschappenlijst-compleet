@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+recognition.lang = "nl-NL";
+recognition.continuous = false;
+recognition.interimResults = false;
 
 const USERS = ["Rene", "Marjolein", "Rosanne"];
 
@@ -45,7 +50,22 @@ async function addItem(e) {
   setAantal("");
   await fetchItems(); // ← deze regel erbij!
 }
+const [listening, setListening] = useState(false);
 
+function startListening() {
+  setListening(true);
+  recognition.start();
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    setProduct(transcript);
+    setListening(false);
+  };
+
+  recognition.onend = () => {
+    setListening(false);
+  };
+}
 
   function handleUserSelect(e) {
     setUser(e.target.value);
@@ -77,12 +97,31 @@ return (
       </label>
 
       <form onSubmit={addItem} style={{ margin: "1rem 0" }}>
-        <input
-          placeholder="Product"
-          value={product}
-          onChange={e => setProduct(e.target.value)}
-          required
-        />
+      <div style={{ display: "flex", alignItems: "center" }}>
+  <input
+    placeholder="Product"
+    value={product}
+    onChange={e => setProduct(e.target.value)}
+    required
+    style={{ flex: 1 }}
+  />
+  <button
+    type="button"
+    onClick={startListening}
+    style={{
+      marginLeft: 8,
+      background: listening ? "#c0ffc0" : "#eee",
+      border: "1px solid #ccc",
+      borderRadius: 6,
+      padding: "0.3em 0.7em",
+      cursor: "pointer"
+    }}
+    title="Spreek productnaam in"
+  >
+    🎤
+  </button>
+</div>
+
         <input
           placeholder="Aantal"
           value={aantal}
