@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
+
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
 recognition.lang = "nl-NL";
 recognition.continuous = false;
 recognition.interimResults = false;
+
 
 const USERS = ["Rene", "Marjolein", "Rosanne"];
 const THEMES = {
@@ -15,11 +17,13 @@ const THEMES = {
 
 
 export default function App() {
+  const [kleur, setKleur] = useState(localStorage.getItem("kleur") || "#a3b18a");
+  const themeColor = kleur;
   const [user, setUser] = useState("");
   const [items, setItems] = useState([]);
   const [product, setProduct] = useState("");
   const [aantal, setAantal] = useState("");
-const themeColor = THEMES[user] || "#ffffff"; // standaard wit
+
 
   // Gebruiker bewaren (localStorage)
   useEffect(() => {
@@ -96,12 +100,32 @@ return (
       <label>
         Wie ben je?{" "}
         <select value={user} onChange={handleUserSelect}>
+
+
           <option value="">Kies gebruiker...</option>
           {USERS.map(name => (
             <option key={name} value={name}>{name}</option>
           ))}
         </select>
       </label>
+
+
+{user && (
+  <div style={{ marginTop: "1rem" }}>
+    <label>
+      Kies je kleur:{" "}
+      <input
+        type="color"
+        value={kleur}
+        onChange={(e) => {
+          setKleur(e.target.value);
+          localStorage.setItem("kleur", e.target.value);
+        }}
+      />
+    </label>
+  </div>
+)}
+
 
       <form onSubmit={addItem} style={{ margin: "1rem 0" }}>
       <div style={{ display: "flex", alignItems: "center" }}>
