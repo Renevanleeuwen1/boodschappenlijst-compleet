@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
+import { openai } from "./openai";
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
@@ -92,6 +93,21 @@ async function deleteItem(id) {
   await supabase.from("boodschappen").delete().eq("id", id);
   await fetchItems(); // <-- deze regel zorgt voor direct updaten!
 }
+async function vraagAanChatGPT(prompt) {
+  try {
+    const response = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    const antwoord = response.data.choices[0].message.content;
+    console.log("ChatGPT antwoord:", antwoord);
+    alert("ChatGPT zegt:\n\n" + antwoord);
+  } catch (error) {
+    console.error("Fout bij ChatGPT:", error);
+    alert("Er ging iets mis bij ChatGPT.");
+  }
+}
 
 
 return (
@@ -125,7 +141,19 @@ return (
     </label>
   </div>
 )}
-
+<button
+  onClick={() => vraagAanChatGPT("Wat kan ik koken met tomaat en paprika?")}
+  style={{
+    marginBottom: "1rem",
+    background: "#a3b18a",
+    border: "none",
+    borderRadius: 6,
+    padding: "0.5em 1em",
+    cursor: "pointer",
+  }}
+>
+  Vraag recept aan ChatGPT
+</button>
 
       <form onSubmit={addItem} style={{ margin: "1rem 0" }}>
       <div style={{ display: "flex", alignItems: "center" }}>
