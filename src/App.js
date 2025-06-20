@@ -65,16 +65,30 @@ export default function App() {
   }, []);
 async function vraagAanChatGPT(prompt) {
   try {
-    const response = await vraagChatGPT({
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
       messages: [{ role: "user", content: prompt }],
     });
     const antwoord = response.choices[0].message.content;
     alert("ChatGPT zegt:\n\n" + antwoord);
   } catch (error) {
     console.error("ChatGPT fout:", error);
-    alert("Foutmelding:\n\n" + error.message);
+
+    // Basis-melding uit het Error-object
+    let foutmelding = error.message;
+
+    // Bij HTTP-errors van OpenAI zit de body vaak in error.response.data
+    if (error.response?.data) {
+      const data = error.response.data;
+      foutmelding = data.error?.message ?? JSON.stringify(data, null, 2);
+    }
+
+    alert("Foutmelding:\n\n" + foutmelding);
   }
 }
+
+
+
 
   async function fetchItems() {
     let { data, error } = await supabase.from("boodschappen").select("*").order("id", { ascending: false });
