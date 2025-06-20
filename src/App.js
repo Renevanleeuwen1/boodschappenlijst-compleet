@@ -1,6 +1,7 @@
+// src/App.js
 import React, { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
-import { vraagChatGPT } from "./openai";           // ← named import, geen default!
+import { vraagChatGPT } from "./openai";      // ← named import!
 import ReceptenZoeker from "./ReceptenZoeker";
 
 const SpeechRecognition =
@@ -19,9 +20,9 @@ export default function App() {
   const [aantal, setAantal] = useState("");
   const [listening, setListening] = useState(false);
 
-  //  ────────────────────────────────────────────────────────
-  //  Init user + realtime updates
-  //  ────────────────────────────────────────────────────────
+  // ────────────────────────────────────────────────────────
+  // 1) User init & realtime Supabase subscription
+  // ────────────────────────────────────────────────────────
   useEffect(() => {
     const saved = localStorage.getItem("user");
     if (saved) setUser(saved);
@@ -40,10 +41,10 @@ export default function App() {
     return () => supabase.removeChannel(channel);
   }, []);
 
-  //  ────────────────────────────────────────────────────────
-  //  Wrapper voor OpenAI
-  //  ────────────────────────────────────────────────────────
-  async function vraagAanChatGPT(prompt) {
+  // ────────────────────────────────────────────────────────
+  // 2) OpenAI-wrapper
+  // ────────────────────────────────────────────────────────
+  async function vraagAanChatGPTWrapper(prompt) {
     try {
       const data = await vraagChatGPT({
         messages: [{ role: "user", content: prompt }],
@@ -56,9 +57,9 @@ export default function App() {
     }
   }
 
-  //  ────────────────────────────────────────────────────────
-  //  CRUD op Supabase
-  //  ────────────────────────────────────────────────────────
+  // ────────────────────────────────────────────────────────
+  // 3) Supabase CRUD functies
+  // ────────────────────────────────────────────────────────
   async function fetchItems() {
     let { data, error } = await supabase
       .from("boodschappen")
@@ -73,14 +74,14 @@ export default function App() {
     await supabase.from("boodschappen").insert([
       {
         product,
-        aantal: aantal ? parseInt(aantal) : null,
+        aantal: aantal ? parseInt(aantal, 10) : null,
         gekocht: false,
         toegevoegd_door: user,
       },
     ]);
     setProduct("");
     setAantal("");
-    fetchItems();
+    await fetchItems();
   }
 
   async function toggleGekocht(id, gekocht) {
@@ -96,9 +97,9 @@ export default function App() {
     fetchItems();
   }
 
-  //  ────────────────────────────────────────────────────────
-  //  Spraakinput
-  //  ────────────────────────────────────────────────────────
+  // ────────────────────────────────────────────────────────
+  // 4) Spraakherkenning
+  // ────────────────────────────────────────────────────────
   function startListening() {
     if (listening) return;
     setListening(true);
@@ -111,9 +112,9 @@ export default function App() {
     recognition.onerror = () => setListening(false);
   }
 
-  //  ────────────────────────────────────────────────────────
-  //  Recepten via ChatGPT
-  //  ────────────────────────────────────────────────────────
+  // ────────────────────────────────────────────────────────
+  // 5) Recepten via ChatGPT op basis van je lijst
+  // ────────────────────────────────────────────────────────
   function vertaalIngredienten(nlLijst) {
     const woordenboek = {
       aardappelen: "potatoes",
@@ -147,14 +148,14 @@ export default function App() {
   function zoekRecepten() {
     const NL = items.map((i) => i.product).join(", ");
     const EN = vertaalIngredienten(NL);
-    vraagAanChatGPT(
+    vraagAanChatGPTWrapper(
       `Geef 3 recepten die ik kan maken met alleen deze ingrediënten: ${EN}.`
     );
   }
 
-  //  ────────────────────────────────────────────────────────
-  //  UI
-  //  ────────────────────────────────────────────────────────
+  // ────────────────────────────────────────────────────────
+  // 6) JSX-rendering
+  // ────────────────────────────────────────────────────────
   return (
     <div
       style={{
@@ -188,7 +189,11 @@ export default function App() {
       <ReceptenZoeker huidigeGebruiker={user} naToevoegen={fetchItems} />
 
       <div style={{ margin: "1rem 0", display: "flex", gap: 8 }}>
-        <button onClick={() => vraagAanChatGPT("Wat kan ik koken met tomaat en paprika?")}>
+        <button
+          onClick={() =>
+            vraagAanChatGPTWrapper("Wat kan ik koken met tomaat en paprika?")
+          }
+        >
           Vraag recept aan ChatGPT
         </button>
         <button onClick={zoekRecepten}>Recepten via ChatGPT</button>
@@ -225,7 +230,7 @@ export default function App() {
           <li
             key={it.id}
             style={{
-              background: it.gekocht ? "#e0ffe0" : "#fff",
+              background: it.gekocht ? "#d9ed92" : "#fff",
               margin: "0.5em 0",
               padding: "0.5em",
               borderRadius: 8,
