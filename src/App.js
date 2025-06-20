@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
-import openai from "./openai";
+import { vraagChatGPT } from "./openai";
+import ReceptenZoeker from "./ReceptenZoeker";
+
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
@@ -61,6 +63,18 @@ export default function App() {
       .subscribe();
     return () => supabase.removeChannel(channel);
   }, []);
+async function vraagAanChatGPT(prompt) {
+  try {
+    const response = await vraagChatGPT({
+      messages: [{ role: "user", content: prompt }],
+    });
+    const antwoord = response.choices[0].message.content;
+    alert("ChatGPT zegt:\n\n" + antwoord);
+  } catch (error) {
+    console.error("ChatGPT fout:", error);
+    alert("Foutmelding:\n\n" + error.message);
+  }
+}
 
   async function fetchItems() {
     let { data, error } = await supabase.from("boodschappen").select("*").order("id", { ascending: false });
@@ -157,6 +171,10 @@ function startListening() {
           ))}
         </select>
       </label>
+<ReceptenZoeker
+  huidigeGebruiker={user}
+  naToevoegen={() => fetchItems()} // ververs boodschappenlijst
+/>
 
       <div style={{ marginTop: "1rem", display: "flex", gap: "0.5rem" }}>
         <button
