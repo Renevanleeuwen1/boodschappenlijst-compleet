@@ -96,6 +96,23 @@ export default function App() {
     await supabase.from("boodschappen").delete().eq("id", id);
     fetchItems();
   }
+// wis alle items die al “gekocht” zijn
+async function clearGekocht() {
+  try {
+    const { error } = await supabase
+      .from("boodschappen")
+      .delete()
+      .eq("gekocht", true);
+    if (error) throw error;
+    // ververs de lijst
+    fetchItems();
+    alert("Alle gekochte items zijn verwijderd!");
+  } catch (err) {
+    console.error("Fout bij wissen:", err);
+    alert("Fout bij wissen: " + err.message);
+  }
+}
+
 
   // ────────────────────────────────────────────────────────
   // 4) Spraakherkenning
@@ -253,6 +270,23 @@ export default function App() {
           </li>
         ))}
       </ul>
+         <button
+     onClick={clearGekocht}
+     disabled={!items.some(i => i.gekocht)}
+     style={{
+       marginTop: "1rem",
+       background: "#ff6666",
+       color: "#fff",
+       border: "none",
+       borderRadius: 6,
+       padding: "0.5em 1em",
+       cursor: items.some(i => i.gekocht) ? "pointer" : "not-allowed",
+       opacity: items.some(i => i.gekocht) ? 1 : 0.5,
+     }}
+   >
+     Wis alle gekochte items
+   </button>
+
     </div>
   );
 }
