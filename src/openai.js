@@ -1,3 +1,5 @@
+// src/openai.js
+
 const API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 
 export async function vraagChatGPT({ messages, model = "gpt-3.5-turbo" }) {
@@ -7,11 +9,13 @@ export async function vraagChatGPT({ messages, model = "gpt-3.5-turbo" }) {
       "Content-Type": "application/json",
       Authorization: "Bearer " + API_KEY,
     },
-    body: JSON.stringify({
-      model,
-      messages,
-    }),
+    body: JSON.stringify({ model, messages }),
   });
-  if (!res.ok) throw new Error("OpenAI fout: " + (await res.text()));
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error("OpenAI fout: " + errorText);
+  }
+
   return await res.json();
 }

@@ -1,1 +1,6 @@
 .env
+# Vite / CRA cache
+node_modules/.cache/
+
+# Local Netlify folder
+.netlify
